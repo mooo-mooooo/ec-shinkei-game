@@ -15,7 +15,7 @@
 
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(135deg, #DC143C 0%, #8B0000 100%);
             min-height: 100vh;
             display: flex;
             flex-direction: column;
@@ -28,14 +28,14 @@
             background: rgba(255, 255, 255, 0.95);
             border-radius: 20px;
             padding: 30px;
-            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
             max-width: 800px;
             width: 100%;
         }
 
         h1 {
             text-align: center;
-            color: #5a67d8;
+            color: #DC143C;
             font-size: clamp(24px, 5vw, 36px);
             margin-bottom: 20px;
             text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
@@ -53,19 +53,21 @@
         #score {
             font-size: clamp(18px, 4vw, 24px);
             font-weight: bold;
-            color: #5a67d8;
-            background: #e9d8fd;
+            color: #DC143C;
+            background: #FFE4E1;
             padding: 10px 20px;
             border-radius: 30px;
+            border: 2px solid #DC143C;
         }
 
         #timer {
             font-size: clamp(18px, 4vw, 24px);
             font-weight: bold;
-            color: #e53e3e;
-            background: #fed7d7;
+            color: #8B0000;
+            background: #FFE4E1;
             padding: 10px 20px;
             border-radius: 30px;
+            border: 2px solid #8B0000;
         }
 
         #gameBoard {
@@ -99,7 +101,7 @@
 
         .card {
             aspect-ratio: 3/2;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(135deg, #DC143C 0%, #B22222 100%);
             color: white;
             display: flex;
             align-items: center;
@@ -112,8 +114,9 @@
             transition: all 0.3s ease;
             position: relative;
             overflow: hidden;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+            box-shadow: 0 4px 15px rgba(220, 20, 60, 0.3);
             min-height: 80px;
+            font-weight: bold;
         }
 
         .card::before {
@@ -139,9 +142,10 @@
 
         .card.flipped {
             background: white;
-            color: #333;
-            border: 2px solid #e9d8fd;
+            color: #DC143C;
+            border: 3px solid #DC143C;
             animation: flipAnimation 0.3s ease;
+            font-weight: bold;
         }
 
         @keyframes flipAnimation {
@@ -157,10 +161,11 @@
         }
 
         .card.matched {
-            background: linear-gradient(135deg, #68d391 0%, #48bb78 100%);
+            background: linear-gradient(135deg, #FF6B6B 0%, #DC143C 100%);
             color: white;
             border: none;
             animation: matchPulse 0.6s ease;
+            box-shadow: 0 0 20px rgba(220, 20, 60, 0.5);
         }
 
         @keyframes matchPulse {
@@ -178,18 +183,18 @@
             padding: 15px 30px;
             font-size: clamp(16px, 3vw, 18px);
             font-weight: bold;
-            background: linear-gradient(135deg, #f56565 0%, #e53e3e 100%);
+            background: linear-gradient(135deg, #DC143C 0%, #8B0000 100%);
             color: white;
             border: none;
             border-radius: 30px;
             cursor: pointer;
             transition: all 0.3s ease;
-            box-shadow: 0 4px 15px rgba(229, 62, 62, 0.3);
+            box-shadow: 0 4px 15px rgba(220, 20, 60, 0.4);
         }
 
         button:hover {
             transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(229, 62, 62, 0.4);
+            box-shadow: 0 6px 20px rgba(220, 20, 60, 0.5);
         }
 
         button:active {
@@ -216,6 +221,7 @@
             text-align: center;
             max-width: 90%;
             animation: modalSlideIn 0.3s ease;
+            border: 3px solid #DC143C;
         }
 
         @keyframes modalSlideIn {
@@ -230,7 +236,7 @@
         }
 
         .modal h2 {
-            color: #5a67d8;
+            color: #DC143C;
             font-size: clamp(24px, 5vw, 36px);
             margin-bottom: 20px;
         }
@@ -270,7 +276,8 @@
         <div class="modal-content">
             <h2>🎉 クリアおめでとうございます！ 🎉</h2>
             <p id="clearTime"></p>
-            <p>他にもあるあるを言い合える仲間と一緒に売上を上げていきませんか？</p>
+            <p>他にもECの"あるある"を共有できる仲間と<br>
+                一緒に解決策を見つけませんか？</p>
             <button onclick="closeModal()">閉じる</button>
         </div>
     </div>
@@ -278,8 +285,8 @@
     <script>
         // カードの内容（ペアで用意）
         const cardContents = [
-            "深夜の注文通知で目が覚める😴",
-            "深夜の注文通知で目が覚める😴",
+            "深夜まで作業😴",
+            "深夜まで作業😴",
             "商品撮影で1日終了📸",
             "商品撮影で1日終了📸",
             "在庫確認ミスで冷や汗💦",
