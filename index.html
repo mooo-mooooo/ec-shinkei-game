@@ -141,7 +141,19 @@
             background: white;
             color: #333;
             border: 2px solid #e9d8fd;
-            transform: rotateY(180deg);
+            animation: flipAnimation 0.3s ease;
+        }
+
+        @keyframes flipAnimation {
+            0% {
+                transform: scale(1, 1);
+            }
+            50% {
+                transform: scale(0.1, 1);
+            }
+            100% {
+                transform: scale(1, 1);
+            }
         }
 
         .card.matched {
@@ -159,9 +171,7 @@
 
         .button-container {
             display: flex;
-            gap: 15px;
             justify-content: center;
-            flex-wrap: wrap;
         }
 
         button {
@@ -244,7 +254,6 @@
         <h1><center>🛍️ ECショップあるある神経衰弱 🛍️<br>
             ～あるあるを言いたい～</center></h1>
         
-        
         <div class="game-info">
             <div id="score">ペア: 0 / 6</div>
             <div id="timer">⏱️ 0:00</div>
@@ -254,7 +263,6 @@
         
         <div class="button-container">
             <button onclick="resetGame()">🔄 リセット</button>
-            <button onclick="showHint()">💡 ヒント</button>
         </div>
     </div>
 
@@ -262,7 +270,7 @@
         <div class="modal-content">
             <h2>🎉 クリアおめでとうございます！ 🎉</h2>
             <p id="clearTime"></p>
-            <p>ECCの勉強会で、もっと詳しく学びませんか？</p>
+            <p>他にもあるあるを言い合える仲間と一緒に売上を上げていきませんか？</p>
             <button onclick="closeModal()">閉じる</button>
         </div>
     </div>
@@ -280,8 +288,8 @@
             "レビュー★1の衝撃😱",
             "SALE前の準備地獄🔥",
             "SALE前の準備地獄🔥",
-            "配送トラブルで謝罪📦",
-            "配送トラブルで謝罪📦"
+            "売れない日の不安☔",
+            "売れない日の不安☔"
         ];
 
         let cards = [];
@@ -392,22 +400,6 @@
             document.getElementById('winModal').style.display = 'none';
         }
 
-        // ヒント機能
-        function showHint() {
-            const unmatched = cards.filter(card => 
-                !card.classList.contains('matched') && 
-                !card.classList.contains('flipped')
-            );
-            
-            if (unmatched.length > 0) {
-                const randomCard = unmatched[Math.floor(Math.random() * unmatched.length)];
-                randomCard.style.animation = 'pulse 0.5s ease 2';
-                setTimeout(() => {
-                    randomCard.style.animation = '';
-                }, 1000);
-            }
-        }
-
         // ゲームリセット
         function resetGame() {
             clearInterval(timerInterval);
@@ -420,16 +412,6 @@
             document.getElementById('timer').textContent = '⏱️ 0:00';
             initGame();
         }
-
-        // パルスアニメーション追加
-        const style = document.createElement('style');
-        style.textContent = `
-            @keyframes pulse {
-                0%, 100% { transform: scale(1); }
-                50% { transform: scale(1.05); box-shadow: 0 0 20px rgba(102, 126, 234, 0.8); }
-            }
-        `;
-        document.head.appendChild(style);
 
         // Service Worker登録
         if ('serviceWorker' in navigator) {
