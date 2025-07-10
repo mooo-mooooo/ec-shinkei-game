@@ -2,104 +2,293 @@
 <html lang="ja">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>ECあるある神経衰弱</title>
+    <link rel="manifest" href="manifest.json">
+    <meta name="apple-mobile-web-app-capable" content="yes">
     <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
         body {
-            font-family: Arial, sans-serif;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
             display: flex;
             flex-direction: column;
             align-items: center;
-            background-color: #f0f0f0;
+            padding: 20px;
+            color: #333;
         }
-        
+
+        .game-container {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            max-width: 800px;
+            width: 100%;
+        }
+
+        h1 {
+            text-align: center;
+            color: #5a67d8;
+            font-size: clamp(24px, 5vw, 36px);
+            margin-bottom: 20px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .game-info {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        #score {
+            font-size: clamp(18px, 4vw, 24px);
+            font-weight: bold;
+            color: #5a67d8;
+            background: #e9d8fd;
+            padding: 10px 20px;
+            border-radius: 30px;
+        }
+
+        #timer {
+            font-size: clamp(18px, 4vw, 24px);
+            font-weight: bold;
+            color: #e53e3e;
+            background: #fed7d7;
+            padding: 10px 20px;
+            border-radius: 30px;
+        }
+
         #gameBoard {
             display: grid;
-            grid-template-columns: repeat(4, 150px);
             gap: 10px;
-            margin: 20px;
+            margin-bottom: 30px;
+            justify-content: center;
         }
-        
+
+        /* レスポンシブグリッド */
+        @media (max-width: 480px) {
+            #gameBoard {
+                grid-template-columns: repeat(3, 1fr);
+            }
+            .game-container {
+                padding: 20px;
+            }
+        }
+
+        @media (min-width: 481px) and (max-width: 768px) {
+            #gameBoard {
+                grid-template-columns: repeat(4, 1fr);
+            }
+        }
+
+        @media (min-width: 769px) {
+            #gameBoard {
+                grid-template-columns: repeat(4, 1fr);
+            }
+        }
+
         .card {
-            width: 150px;
-            height: 100px;
-            background-color: #4169e1;
+            aspect-ratio: 3/2;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
             display: flex;
             align-items: center;
             justify-content: center;
-            border-radius: 10px;
+            border-radius: 15px;
             cursor: pointer;
-            font-size: 14px;
+            font-size: clamp(12px, 2.5vw, 16px);
             text-align: center;
             padding: 10px;
-            transition: transform 0.3s;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+            min-height: 80px;
         }
-        
+
+        .card::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255,255,255,0.3) 0%, transparent 70%);
+            transform: rotate(45deg);
+            transition: all 0.5s ease;
+            opacity: 0;
+        }
+
+        .card:hover::before {
+            opacity: 1;
+        }
+
+        .card:active {
+            transform: scale(0.95);
+        }
+
         .card.flipped {
-            background-color: white;
+            background: white;
             color: #333;
-            border: 2px solid #4169e1;
+            border: 2px solid #e9d8fd;
+            transform: rotateY(180deg);
         }
-        
+
         .card.matched {
-            background-color: #90EE90;
-            border: 2px solid #228B22;
-        }
-        
-        #score {
-            font-size: 24px;
-            margin: 20px;
-        }
-        
-        button {
-            padding: 10px 20px;
-            font-size: 18px;
-            background-color: #ff6b6b;
+            background: linear-gradient(135deg, #68d391 0%, #48bb78 100%);
             color: white;
             border: none;
-            border-radius: 5px;
+            animation: matchPulse 0.6s ease;
+        }
+
+        @keyframes matchPulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); }
+        }
+
+        .button-container {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        button {
+            padding: 15px 30px;
+            font-size: clamp(16px, 3vw, 18px);
+            font-weight: bold;
+            background: linear-gradient(135deg, #f56565 0%, #e53e3e 100%);
+            color: white;
+            border: none;
+            border-radius: 30px;
             cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(229, 62, 62, 0.3);
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(229, 62, 62, 0.4);
+        }
+
+        button:active {
+            transform: translateY(0);
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal-content {
+            background: white;
+            padding: 40px;
+            border-radius: 20px;
+            text-align: center;
+            max-width: 90%;
+            animation: modalSlideIn 0.3s ease;
+        }
+
+        @keyframes modalSlideIn {
+            from {
+                transform: translateY(-50px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        .modal h2 {
+            color: #5a67d8;
+            font-size: clamp(24px, 5vw, 36px);
+            margin-bottom: 20px;
+        }
+
+        .modal p {
+            font-size: clamp(16px, 3vw, 20px);
+            margin-bottom: 30px;
+            color: #666;
+        }
+
+        /* タッチデバイス用の調整 */
+        @media (hover: none) {
+            .card:hover::before {
+                opacity: 0;
+            }
         }
     </style>
- 
-    
-    <!-- PWA用の追記 -->
-    <link rel="manifest" href="manifest.json">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="default">
-    <link rel="apple-touch-icon" href="icon-192.png">
-
-
 </head>
 <body>
-    <h1><center>ECショップあるある神経衰弱<br>
-           ～あるあるを言いたい～</center></h1>
-    <div id="score">ペア: 0 / 6</div>
-    <div id="gameBoard"></div>
-    <button onclick="resetGame()">リセット</button>
+    <div class="game-container">
+        <h1>🛍️ ECショップあるある神経衰弱 🛍️</h1><br>
+        <h2>～あるあるを言いたい～</h2>
+        
+        <div class="game-info">
+            <div id="score">ペア: 0 / 6</div>
+            <div id="timer">⏱️ 0:00</div>
+        </div>
+        
+        <div id="gameBoard"></div>
+        
+        <div class="button-container">
+            <button onclick="resetGame()">🔄 リセット</button>
+            <button onclick="showHint()">💡 ヒント</button>
+        </div>
+    </div>
+
+    <div id="winModal" class="modal">
+        <div class="modal-content">
+            <h2>🎉 クリアおめでとうございます！ 🎉</h2>
+            <p id="clearTime"></p>
+            <p>ECCの勉強会で、もっと詳しく学びませんか？</p>
+            <button onclick="closeModal()">閉じる</button>
+        </div>
+    </div>
 
     <script>
         // カードの内容（ペアで用意）
         const cardContents = [
-            "深夜の注文通知で目が覚める",
-            "深夜の注文通知で目が覚める",
-            "商品撮影で1日終了",
-            "商品撮影で1日終了",
-            "在庫確認ミスで冷や汗",
-            "在庫確認ミスで冷や汗",
-            "レビュー★1の衝撃",
-            "レビュー★1の衝撃",
-            "SALE前の準備地獄",
-            "SALE前の準備地獄",
-            "ECCからの電話にドキッ",
-            "ECCからの電話にドキッ"
+            "深夜の注文通知で目が覚める😴",
+            "深夜の注文通知で目が覚める😴",
+            "商品撮影で1日終了📸",
+            "商品撮影で1日終了📸",
+            "在庫確認ミスで冷や汗💦",
+            "在庫確認ミスで冷や汗💦",
+            "レビュー★1の衝撃😱",
+            "レビュー★1の衝撃😱",
+            "SALE前の準備地獄🔥",
+            "SALE前の準備地獄🔥",
+            "配送トラブルで謝罪📦",
+            "配送トラブルで謝罪📦"
         ];
 
         let cards = [];
         let flippedCards = [];
         let matchedPairs = 0;
         let canFlip = true;
+        let startTime = null;
+        let timerInterval = null;
 
         // ゲーム初期化
         function initGame() {
@@ -120,6 +309,20 @@
                 gameBoard.appendChild(card);
                 cards.push(card);
             });
+
+            // タイマー開始
+            startTime = Date.now();
+            updateTimer();
+            timerInterval = setInterval(updateTimer, 100);
+        }
+
+        // タイマー更新
+        function updateTimer() {
+            if (!startTime) return;
+            const elapsed = Math.floor((Date.now() - startTime) / 1000);
+            const minutes = Math.floor(elapsed / 60);
+            const seconds = elapsed % 60;
+            document.getElementById('timer').textContent = `⏱️ ${minutes}:${seconds.toString().padStart(2, '0')}`;
         }
 
         // カードをめくる
@@ -146,19 +349,20 @@
             
             if (card1.dataset.content === card2.dataset.content) {
                 // ペア成立
-                card1.classList.add('matched');
-                card2.classList.add('matched');
-                matchedPairs++;
-                document.getElementById('score').textContent = `ペア: ${matchedPairs} / 6`;
-                
-                if (matchedPairs === 6) {
-                    setTimeout(() => {
-                        alert('クリア！おめでとうございます！\n勉強会の詳細はスタッフまで！');
-                    }, 500);
-                }
-                
-                flippedCards = [];
-                canFlip = true;
+                setTimeout(() => {
+                    card1.classList.add('matched');
+                    card2.classList.add('matched');
+                    matchedPairs++;
+                    document.getElementById('score').textContent = `ペア: ${matchedPairs} / 6`;
+                    
+                    if (matchedPairs === 6) {
+                        clearInterval(timerInterval);
+                        showWinModal();
+                    }
+                    
+                    flippedCards = [];
+                    canFlip = true;
+                }, 300);
             } else {
                 // ペア不成立
                 setTimeout(() => {
@@ -172,25 +376,67 @@
             }
         }
 
+        // 勝利モーダル表示
+        function showWinModal() {
+            const elapsed = Math.floor((Date.now() - startTime) / 1000);
+            const minutes = Math.floor(elapsed / 60);
+            const seconds = elapsed % 60;
+            document.getElementById('clearTime').textContent = 
+                `クリアタイム: ${minutes}分${seconds}秒`;
+            document.getElementById('winModal').style.display = 'flex';
+        }
+
+        // モーダルを閉じる
+        function closeModal() {
+            document.getElementById('winModal').style.display = 'none';
+        }
+
+        // ヒント機能
+        function showHint() {
+            const unmatched = cards.filter(card => 
+                !card.classList.contains('matched') && 
+                !card.classList.contains('flipped')
+            );
+            
+            if (unmatched.length > 0) {
+                const randomCard = unmatched[Math.floor(Math.random() * unmatched.length)];
+                randomCard.style.animation = 'pulse 0.5s ease 2';
+                setTimeout(() => {
+                    randomCard.style.animation = '';
+                }, 1000);
+            }
+        }
+
         // ゲームリセット
         function resetGame() {
+            clearInterval(timerInterval);
             cards = [];
             flippedCards = [];
             matchedPairs = 0;
             canFlip = true;
+            startTime = null;
             document.getElementById('score').textContent = 'ペア: 0 / 6';
+            document.getElementById('timer').textContent = '⏱️ 0:00';
             initGame();
+        }
+
+        // パルスアニメーション追加
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes pulse {
+                0%, 100% { transform: scale(1); }
+                50% { transform: scale(1.05); box-shadow: 0 0 20px rgba(102, 126, 234, 0.8); }
+            }
+        `;
+        document.head.appendChild(style);
+
+        // Service Worker登録
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('sw.js').catch(() => {});
         }
 
         // ゲーム開始
         initGame();
-        // ゲームのJavaScriptの最後に追加
-if ('serviceWorker' in navigator) {
-  window.addEventListener('load', () => {
-    navigator.serviceWorker.register('/sw.js');
-  });
-}
     </script>
 </body>
 </html>
-
