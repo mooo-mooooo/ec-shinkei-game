@@ -254,6 +254,80 @@
                 opacity: 0;
             }
         }
+        #playerName {
+            padding: 10px 20px;
+            font-size: 16px;
+            border: 2px solid #DC143C;
+            border-radius: 20px;
+            margin: 10px;
+            width: 200px;
+        }
+        
+        .ranking-section {
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 2px solid #eee;
+        }
+        
+        .ranking-section h3 {
+            color: #DC143C;
+            margin-bottom: 15px;
+        }
+        
+        .ranking-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px;
+            margin: 5px 0;
+            background: #f8f8f8;
+            border-radius: 10px;
+            font-size: 16px;
+        }
+        
+        .ranking-item:nth-child(1) {
+            background: linear-gradient(135deg, #FFD700, #FFA500);
+            color: white;
+            font-weight: bold;
+        }
+        
+        .ranking-item:nth-child(2) {
+            background: linear-gradient(135deg, #C0C0C0, #808080);
+            color: white;
+        }
+        
+        .ranking-item:nth-child(3) {
+            background: linear-gradient(135deg, #CD7F32, #8B4513);
+            color: white;
+        }
+        
+        .rank {
+            font-weight: bold;
+            min-width: 40px;
+        }
+        
+        .name {
+            flex: 1;
+            text-align: left;
+            margin: 0 10px;
+        }
+        
+        .time {
+            font-weight: bold;
+            color: #DC143C;
+        }
+        
+        .ranking-item:nth-child(1) .time,
+        .ranking-item:nth-child(2) .time,
+        .ranking-item:nth-child(3) .time {
+            color: white;
+        }
+        
+        #rankingList2 {
+            max-height: 400px;
+            overflow-y: auto;
+        }
+
     </style>
 </head>
 <body>
@@ -268,9 +342,46 @@
         
         <div id="gameBoard"></div>
         
+                <!-- ボタンコンテナーに追加 -->
         <div class="button-container">
             <button onclick="resetGame()">🔄 リセット</button>
+            <button onclick="showRankings()">🏆 ランキング</button>
         </div>
+        
+        <!-- winModalの内容を以下に置き換え -->
+        <div id="winModal" class="modal">
+            <div class="modal-content">
+                <h2>🎉 クリアおめでとうございます！ 🎉</h2>
+                <p id="clearTime"></p>
+                
+                <div id="nameInputSection">
+                    <p>ランキングに記録しますか？</p>
+                    <input type="text" id="playerName" placeholder="お名前を入力" maxlength="20">
+                    <button onclick="saveScore()">記録する</button>
+                </div>
+                
+                <div id="rankingSaved" style="display: none;">
+                    <p style="color: #48bb78; font-weight: bold;">✅ ランキングに記録されました！</p>
+                </div>
+                
+                <div class="ranking-section">
+                    <h3>🏆 現在のランキング TOP5 🏆</h3>
+                    <div id="rankingList"></div>
+                </div>
+                
+                <button onclick="closeModal()">閉じる</button>
+            </div>
+        </div>
+        
+        <!-- ランキング専用モーダルを追加 -->
+        <div id="rankingModal" class="modal">
+            <div class="modal-content">
+                <h2>🏆 ランキング 🏆</h2>
+                <div id="rankingList2" class="ranking-list"></div>
+                <button onclick="closeRankingModal()">閉じる</button>
+            </div>
+        </div>
+
     </div>
 
     <div id="winModal" class="modal">
@@ -428,6 +539,117 @@
 
         // ゲーム開始
         initGame();
+
+        // ランキングデータを管理する関数を追加
+        function getRankings() {
+            const rankings = localStorage.getItem('ecGameRankings');
+            return rankings ? JSON.parse(rankings) : [];
+        }
+        
+        function saveRanking(time, name) {
+            const rankings = getRankings();
+            rankings.push({ name, time, date: new Date().toLocaleDateString() });
+            rankings.sort((a, b) => a.time - b.time);
+            rankings.splice(10); // 上位10件のみ保持
+            localStorage.setItem('ecGameRankings', JSON.stringify(rankings));
+        }
+        
+        // showWinModal関数を以下に置き換え
+        function showWinModal() {
+            const elapsed = Math.floor((Date.now() - startTime) / 1000);
+            const minutes = Math.floor(elapsed / 60);
+            const seconds = elapsed % 60;
+            
+            // 現在のタイムを保存
+            window.currentClearTime = elapsed;
+            
+            document.getElementById('clearTime').textContent = 
+                `クリアタイム: ${minutes}分${seconds}秒`;
+            
+            // ランキング表示を更新
+            updateRankingDisplay();
+            
+            document.getElementById('winModal').style.display = 'flex';
+        }
+        
+        // ランキング表示を更新する関数
+        function updateRankingDisplay() {
+            const rankings = getRankings();
+            const rankingList = document.getElementById('rankingList');
+            rankingList.innerHTML = '';
+            
+            if (rankings.length === 0) {
+                rankingList.innerHTML = '<p style="color: #666;">まだ記録がありません</p>';
+                return;
+            }
+            
+            rankings.forEach((record, index) => {
+                const minutes = Math.floor(record.time / 60);
+                const seconds = record.time % 60;
+                const item = document.createElement('div');
+                item.className = 'ranking-item';
+                item.innerHTML = `
+                    <span class="rank">${index + 1}位</span>
+                    <span class="name">${record.name}</span>
+                    <span class="time">${minutes}分${seconds}秒</span>
+                `;
+                rankingList.appendChild(item);
+            });
+        }
+        
+        // 名前を入力して記録を保存
+        function saveScore() {
+            const nameInput = document.getElementById('playerName');
+            const name = nameInput.value.trim() || '名無しさん';
+            
+            saveRanking(window.currentClearTime, name);
+            updateRankingDisplay();
+            
+            // 入力欄を非表示にして、ランキングを強調表示
+            document.getElementById('nameInputSection').style.display = 'none';
+            document.getElementById('rankingSaved').style.display = 'block';
+        }
+        
+        // ランキングを表示する関数
+        function showRankings() {
+            const rankings = getRankings();
+            const rankingList = document.getElementById('rankingList2');
+            rankingList.innerHTML = '';
+            
+            if (rankings.length === 0) {
+                rankingList.innerHTML = '<p style="color: #666;">まだ記録がありません</p>';
+            } else {
+                rankings.forEach((record, index) => {
+                    const minutes = Math.floor(record.time / 60);
+                    const seconds = record.time % 60;
+                    const item = document.createElement('div');
+                    item.className = 'ranking-item';
+                    item.innerHTML = `
+                        <span class="rank">${index + 1}位</span>
+                        <span class="name">${record.name}</span>
+                        <span class="time">${minutes}分${seconds}秒</span>
+                    `;
+                    rankingList.appendChild(item);
+                });
+            }
+    
+            document.getElementById('rankingModal').style.display = 'flex';
+        }
+
+        
+        // ランキングモーダルを閉じる
+        function closeRankingModal() {
+            document.getElementById('rankingModal').style.display = 'none';
+        }
+        
+        // closeModal関数を更新
+        function closeModal() {
+            document.getElementById('winModal').style.display = 'none';
+            document.getElementById('nameInputSection').style.display = 'block';
+            document.getElementById('rankingSaved').style.display = 'none';
+            document.getElementById('playerName').value = '';
+        }
+
     </script>
 </body>
 </html>
