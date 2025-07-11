@@ -425,13 +425,30 @@
         </div>
         
         <!-- ランキング専用モーダルを追加 -->
+        <!-- ランキングモーダルに管理者用ボタンを追加 -->
         <div id="rankingModal" class="modal">
             <div class="modal-content">
                 <h2>🏆 ランキング 🏆</h2>
                 <div id="rankingList2" class="ranking-list"></div>
-                <button onclick="closeRankingModal()">閉じる</button>
+                
+                <!-- 管理者用ボタン群 -->
+                <div class="admin-buttons" style="margin-top: 20px; padding-top: 20px; border-top: 2px solid #eee;">
+                    <p style="color: #666; font-size: 14px; margin-bottom: 10px;">管理者用機能</p>
+                    <button onclick="downloadRankingData()" style="background: #4CAF50; margin: 5px;">
+                        📥 データダウンロード
+                    </button>
+                    <button onclick="showStatistics()" style="background: #2196F3; margin: 5px;">
+                        📊 統計情報
+                    </button>
+                    <button onclick="resetRankings()" style="background: #666; margin: 5px;">
+                        🗑️ データリセット
+                    </button>
+                </div>
+                
+                <button onclick="closeRankingModal()" style="margin-top: 10px;">閉じる</button>
             </div>
         </div>
+
 
     </div>
 
@@ -601,7 +618,7 @@
             const rankings = getRankings();
             rankings.push({ name, time, date: new Date().toLocaleDateString() });
             rankings.sort((a, b) => a.time - b.time);
-            rankings.splice(10); // 上位10件のみ保持
+            //rankings.splice(10); // 上位10件のみ保持
             localStorage.setItem('ecGameRankings', JSON.stringify(rankings));
         }
         
@@ -670,22 +687,31 @@
             if (rankings.length === 0) {
                 rankingList.innerHTML = '<p style="color: #666;">まだ記録がありません</p>';
             } else {
-                rankings.forEach((record, index) => {
+                // 表示は上位10件のみ、データは全件保持
+                const displayCount = Math.min(rankings.length, 10);
+                
+                for (let i = 0; i < displayCount; i++) {
+                    const record = rankings[i];
                     const minutes = Math.floor(record.time / 60);
                     const seconds = record.time % 60;
                     const item = document.createElement('div');
                     item.className = 'ranking-item';
                     item.innerHTML = `
-                        <span class="rank">${index + 1}位</span>
+                        <span class="rank">${i + 1}位</span>
                         <span class="name">${record.name}</span>
                         <span class="time">${minutes}分${seconds}秒</span>
                     `;
                     rankingList.appendChild(item);
-                });
+                }
+                
+                if (rankings.length > 10) {
+                    rankingList.innerHTML += `<p style="color: #666; margin-top: 10px;">他${rankings.length - 10}件の記録があります</p>`;
+                }
             }
-    
+            
             document.getElementById('rankingModal').style.display = 'flex';
         }
+
 
         
         // ランキングモーダルを閉じる
@@ -700,7 +726,61 @@
             document.getElementById('rankingSaved').style.display = 'none';
             document.getElementById('playerName').value = '';
         }
-
+        // CSVダウンロード機能を追加
+        function downloadRankingData() {
+            const rankings = getRankings();
+            
+            if (rankings.length === 0) {
+                alert('ダウンロードするデータがありません');
+                return;
+            }
+            
+            // CSVヘッダー
+            let csv = '順位,名前,タイム（秒）,タイム（表示）,日付\n';
+            
+            // データ行を追加
+            rankings.forEach((record, index) => {
+                const minutes = Math.floor(record.time / 60);
+                const seconds = record.time % 60;
+                const timeDisplay = `${minutes}分${seconds}秒`;
+                csv += `${index + 1},${record.name},${record.time},${timeDisplay},${record.date}\n`;
+            });
+            
+            // BOMを追加（Excelで文字化けを防ぐ）
+            const bom = new Uint8Array([0xEF, 0xBB, 0xBF]);
+            const blob = new Blob([bom, csv], { type: 'text/csv;charset=utf-8;' });
+            
+            // ダウンロードリンクを作成
+            const link = document.createElement('a');
+            const url = URL.createObjectURL(blob);
+            link.setAttribute('href', url);
+            link.setAttribute('download', `ECゲームランキング_${new Date().toLocaleDateString()}.csv`);
+            link.style.visibility = 'hidden';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+        
+        // 統計情報を表示する関数（オプション）
+        function showStatistics() {
+            const rankings = getRankings();
+            
+            if (rankings.length === 0) {
+                alert('データがありません');
+                return;
+            }
+            
+            const totalPlayers = rankings.length;
+            const times = rankings.map(r => r.time);
+            const avgTime = Math.floor(times.reduce((a, b) => a + b, 0) / totalPlayers);
+            const bestTime = Math.min(...times);
+            const worstTime = Math.max(...times);
+            
+            const avgMinutes = Math.floor(avgTime / 60);
+            const avgSeconds = avgTime % 60;
+            
+            alert(`📊 統計情報\n\n参加者数: ${totalPlayers}人\n平均タイム: ${avgMinutes}分${avgSeconds}秒\n最速: ${Math.floor(bestTime / 60)}分${bestTime % 60}秒\n最遅: ${Math.floor(worstTime / 60)}分${worstTime % 60}秒`);
+        }
     </script>
 </body>
 </html>
