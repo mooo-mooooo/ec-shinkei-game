@@ -50,7 +50,7 @@
             gap: 15px;
         }
 
-        #score {
+        #score, #timer, #missCount, #playerCount { /* #missCount, #playerCount を追加 */
             font-size: clamp(18px, 4vw, 24px);
             font-weight: bold;
             color: #DC143C;
@@ -58,17 +58,25 @@
             padding: 10px 20px;
             border-radius: 30px;
             border: 2px solid #DC143C;
+            flex-grow: 1; /* 要素が均等に広がるように */
+            text-align: center; /* テキストを中央寄せ */
         }
 
         #timer {
-            font-size: clamp(18px, 4vw, 24px);
-            font-weight: bold;
             color: #8B0000;
-            background: #FFE4E1;
-            padding: 10px 20px;
-            border-radius: 30px;
             border: 2px solid #8B0000;
         }
+
+        #missCount { /* ミス回数用のスタイル */
+            color: #FF4500; /* オレンジレッド */
+            border: 2px solid #FF4500;
+        }
+        
+        #playerCount { /* 挑戦者数用のスタイル */
+            color: #008080; /* ティール */
+            border: 2px solid #008080;
+        }
+
 
         #gameBoard {
             display: grid;
@@ -84,6 +92,13 @@
             }
             .game-container {
                 padding: 20px;
+            }
+            .game-info {
+                flex-direction: column; /* 縦並びにする */
+                align-items: stretch; /* 幅いっぱいに広げる */
+            }
+            #score, #timer, #missCount, #playerCount {
+                width: 100%; /* 幅いっぱいに */
             }
         }
 
@@ -161,13 +176,12 @@
         }
 
         .card.matched {
-        background: linear-gradient(135deg, #68d391 0%, #48bb78 100%);
-        color: white;
-        border: none;
-        animation: matchPulse 0.6s ease;
-        box-shadow: 0 0 20px rgba(72, 187, 120, 0.5);
+            background: linear-gradient(135deg, #68d391 0%, #48bb78 100%);
+            color: white;
+            border: none;
+            animation: matchPulse 0.6s ease;
+            box-shadow: 0 0 20px rgba(72, 187, 120, 0.5);
         }
-
 
         @keyframes matchPulse {
             0% { transform: scale(1); }
@@ -178,6 +192,8 @@
         .button-container {
             display: flex;
             justify-content: center;
+            gap: 15px; /* ボタン間のスペース */
+            flex-wrap: wrap; /* 小さい画面で折り返す */
         }
 
         button {
@@ -243,8 +259,6 @@
                 overflow-y: auto;
             }
         }
-
-
         @keyframes modalSlideIn {
             from {
                 transform: translateY(-50px);
@@ -255,19 +269,16 @@
                 opacity: 1;
             }
         }
-
         .modal h2 {
             color: #DC143C;
             font-size: clamp(24px, 5vw, 36px);
             margin-bottom: 20px;
         }
-
         .modal p {
             font-size: clamp(16px, 3vw, 20px);
-            margin-bottom: 30px;
+            margin-bottom: 10px; /* 調整 */
             color: #666;
         }
-
         /* タッチデバイス用の調整 */
         @media (hover: none) {
             .card:hover::before {
@@ -281,6 +292,7 @@
             border-radius: 20px;
             margin: 10px;
             width: 200px;
+            max-width: 80%;
         }
         
         .ranking-section {
@@ -291,6 +303,7 @@
         
         .ranking-section h3 {
             color: #DC143C;
+            font-size: clamp(18px, 4vw, 24px);
             margin-bottom: 15px;
         }
         
@@ -302,22 +315,22 @@
             margin: 5px 0;
             background: #f8f8f8;
             border-radius: 10px;
-            font-size: 16px;
+            font-size: clamp(14px, 3vw, 16px);
         }
         
         .ranking-item:nth-child(1) {
-            background: linear-gradient(135deg, #FFD700, #FFA500);
+            background: linear-gradient(135deg, #FFD700 0%, #FFA500 100%);
             color: white;
             font-weight: bold;
         }
         
         .ranking-item:nth-child(2) {
-            background: linear-gradient(135deg, #C0C0C0, #808080);
+            background: linear-gradient(135deg, #C0C0C0 0%, #808080 100%);
             color: white;
         }
         
         .ranking-item:nth-child(3) {
-            background: linear-gradient(135deg, #CD7F32, #8B4513);
+            background: linear-gradient(135deg, #CD7F32 0%, #8B4513 100%);
             color: white;
         }
         
@@ -330,6 +343,7 @@
             flex: 1;
             text-align: left;
             margin: 0 10px;
+            word-break: break-all; /* 長い名前がはみ出さないように */
         }
         
         .time {
@@ -356,27 +370,36 @@
         
         /* スクロールバーのスタイリング（オプション） */
         .modal-content::-webkit-scrollbar,
-        #rankingList::-webkit-scrollbar {
+        #rankingList::-webkit-scrollbar,
+        #rankingList2::-webkit-scrollbar { /* #rankingList2 も追加 */
             width: 8px;
         }
         
         .modal-content::-webkit-scrollbar-track,
-        #rankingList::-webkit-scrollbar-track {
+        #rankingList::-webkit-scrollbar-track,
+        #rankingList2::-webkit-scrollbar-track { /* #rankingList2 も追加 */
             background: #f1f1f1;
             border-radius: 10px;
         }
         
         .modal-content::-webkit-scrollbar-thumb,
-        #rankingList::-webkit-scrollbar-thumb {
+        #rankingList::-webkit-scrollbar-thumb,
+        #rankingList2::-webkit-scrollbar-thumb { /* #rankingList2 も追加 */
             background: #DC143C;
             border-radius: 10px;
         }
         
         .modal-content::-webkit-scrollbar-thumb:hover,
-        #rankingList::-webkit-scrollbar-thumb:hover {
+        #rankingList::-webkit-scrollbar-thumb:hover,
+        #rankingList2::-webkit-scrollbar-thumb:hover { /* #rankingList2 も追加 */
             background: #8B0000;
         }
 
+        .admin-buttons button { /* 管理者ボタンのスタイル調整 */
+            font-size: clamp(14px, 3vw, 16px);
+            padding: 10px 15px;
+            margin: 5px;
+        }
     </style>
 </head>
 <body>
@@ -386,18 +409,19 @@
         
         <div class="game-info">
             <div id="score">ペア: 0 / 6</div>
+            <div id="missCount">ミス: 0</div> <!-- ここにミス回数を表示 -->
+            <div id="playerCount">挑戦者: 1人目</div> <!-- ここに挑戦者数を表示 -->
             <div id="timer">⏱️ 0:00</div>
         </div>
         
         <div id="gameBoard"></div>
         
-                <!-- ボタンコンテナーに追加 -->
         <div class="button-container">
             <button onclick="resetGame()">🔄 リセット</button>
             <button onclick="showRankings()">🏆 ランキング</button>
         </div>
         
-        <!-- winModalの内容を以下に置き換え -->
+        <!-- winModalは一つにまとめる -->
         <div id="winModal" class="modal">
             <div class="modal-content">
                 <h2>🎉 クリアおめでとうございます！ 🎉</h2>
@@ -424,8 +448,17 @@
             </div>
         </div>
         
-        <!-- ランキング専用モーダルを追加 -->
-        <!-- ランキングモーダルに管理者用ボタンを追加 -->
+        <!-- ゲームオーバーモーダルを追加 (前回のコードで抜けていた場合) -->
+        <div id="gameOverModal" class="modal">
+            <div class="modal-content">
+                <h2>😢 ゲームオーバー 😢</h2>
+                <p>試行回数が上限に達しました</p>
+                <p>もう一度チャレンジしてみましょう！</p>
+                <button onclick="resetGame()">もう一度プレイ</button>
+            </div>
+        </div>
+
+        <!-- ランキング専用モーダル -->
         <div id="rankingModal" class="modal">
             <div class="modal-content">
                 <h2>🏆 ランキング 🏆</h2>
@@ -447,18 +480,6 @@
                 
                 <button onclick="closeRankingModal()" style="margin-top: 10px;">閉じる</button>
             </div>
-        </div>
-
-
-    </div>
-
-    <div id="winModal" class="modal">
-        <div class="modal-content">
-            <h2>🎉 クリアおめでとうございます！ 🎉</h2>
-            <p id="clearTime"></p>
-            <p>他にもECの"あるある"を共有できる仲間と<br>
-                一緒に解決策を見つけませんか？</p>
-            <button onclick="closeModal()">閉じる</button>
         </div>
     </div>
 
@@ -485,6 +506,8 @@
         let canFlip = true;
         let startTime = null;
         let timerInterval = null;
+        let missCount = 0; // ミス回数を追加
+        let playerCount = 1; // 挑戦者数を追加
 
         // ゲーム初期化
         function initGame() {
@@ -505,6 +528,18 @@
                 gameBoard.appendChild(card);
                 cards.push(card);
             });
+
+            // 変数リセット
+            missCount = 0;
+            matchedPairs = 0;
+            canFlip = true;
+            flippedCards = [];
+
+            // 表示を更新
+            document.getElementById('score').textContent = 'ペア: 0 / 6';
+            document.getElementById('missCount').textContent = `ミス: ${missCount}`;
+            // 挑戦者数は、ゲーム開始時またはリセット時に更新
+            updatePlayerCount(); // ここで挑戦者数を更新
 
             // タイマー開始
             startTime = Date.now();
@@ -561,6 +596,8 @@
                 }, 300);
             } else {
                 // ペア不成立
+                missCount++; // ミス回数をインクリメント
+                document.getElementById('missCount').textContent = `ミス: ${missCount}`; // 表示を更新
                 setTimeout(() => {
                     card1.classList.remove('flipped');
                     card2.classList.remove('flipped');
@@ -577,27 +614,52 @@
             const elapsed = Math.floor((Date.now() - startTime) / 1000);
             const minutes = Math.floor(elapsed / 60);
             const seconds = elapsed % 60;
+            
+            // 現在のタイムを保存
+            window.currentClearTime = elapsed;
+            
             document.getElementById('clearTime').textContent = 
-                `クリアタイム: ${minutes}分${seconds}秒`;
+                `クリアタイム: ${minutes}分${seconds}秒\nミス回数: ${missCount}回`; // ミス回数も表示
+            
+            // ランキング表示を更新
+            updateRankingDisplay();
+            
             document.getElementById('winModal').style.display = 'flex';
         }
 
         // モーダルを閉じる
         function closeModal() {
             document.getElementById('winModal').style.display = 'none';
+            document.getElementById('nameInputSection').style.display = 'block';
+            document.getElementById('rankingSaved').style.display = 'none';
+            document.getElementById('playerName').value = '';
+            // ゲームをリセットして次の挑戦者へ
+            resetGame(); // クリア後、自動でリセット
         }
 
         // ゲームリセット
         function resetGame() {
             clearInterval(timerInterval);
             cards = [];
-            flippedCards = [];
-            matchedPairs = 0;
-            canFlip = true;
+            // flippedCards = []; // initGameでリセットされる
+            // matchedPairs = 0; // initGameでリセットされる
+            // canFlip = true; // initGameでリセットされる
             startTime = null;
-            document.getElementById('score').textContent = 'ペア: 0 / 6';
-            document.getElementById('timer').textContent = '⏱️ 0:00';
-            initGame();
+            // missCount = 0; // initGameでリセットされる
+            
+            // 挑戦者数をインクリメント
+            playerCount++;
+            updatePlayerCount(); // 表示を更新
+
+            initGame(); // ゲームボードを再構築し、変数をリセット
+        }
+
+        // 挑戦者数を更新する関数
+        function updatePlayerCount() {
+            // ローカルストレージから取得したランキングの数 + 1を挑戦者数とする
+            const rankings = getRankings();
+            playerCount = rankings.length + 1; 
+            document.getElementById('playerCount').textContent = `挑戦者: ${playerCount}人目`;
         }
 
         // Service Worker登録
@@ -605,10 +667,7 @@
             navigator.serviceWorker.register('sw.js').catch(() => {});
         }
 
-        // ゲーム開始
-        initGame();
-
-        // ランキングデータを管理する関数を追加
+        // ランキングデータを管理する関数
         function getRankings() {
             const rankings = localStorage.getItem('ecGameRankings');
             return rankings ? JSON.parse(rankings) : [];
@@ -616,28 +675,9 @@
         
         function saveRanking(time, name) {
             const rankings = getRankings();
-            rankings.push({ name, time, date: new Date().toLocaleDateString() });
+            rankings.push({ name, time, date: new Date().toLocaleDateString(), missCount: missCount }); // ミス回数も保存
             rankings.sort((a, b) => a.time - b.time);
-            //rankings.splice(10); // 上位10件のみ保持
             localStorage.setItem('ecGameRankings', JSON.stringify(rankings));
-        }
-        
-        // showWinModal関数を以下に置き換え
-        function showWinModal() {
-            const elapsed = Math.floor((Date.now() - startTime) / 1000);
-            const minutes = Math.floor(elapsed / 60);
-            const seconds = elapsed % 60;
-            
-            // 現在のタイムを保存
-            window.currentClearTime = elapsed;
-            
-            document.getElementById('clearTime').textContent = 
-                `クリアタイム: ${minutes}分${seconds}秒`;
-            
-            // ランキング表示を更新
-            updateRankingDisplay();
-            
-            document.getElementById('winModal').style.display = 'flex';
         }
         
         // ランキング表示を更新する関数
@@ -651,18 +691,21 @@
                 return;
             }
             
-            rankings.forEach((record, index) => {
+            // 表示は上位5件のみ
+            const displayCount = Math.min(rankings.length, 5);
+            for (let i = 0; i < displayCount; i++) {
+                const record = rankings[i];
                 const minutes = Math.floor(record.time / 60);
                 const seconds = record.time % 60;
                 const item = document.createElement('div');
                 item.className = 'ranking-item';
                 item.innerHTML = `
-                    <span class="rank">${index + 1}位</span>
+                    <span class="rank">${i + 1}位</span>
                     <span class="name">${record.name}</span>
-                    <span class="time">${minutes}分${seconds}秒</span>
-                `;
+                    <span class="time">${minutes}分${seconds}秒 (ミス: ${record.missCount || 0})</span>
+                `; // ミス回数も表示
                 rankingList.appendChild(item);
-            });
+            }
         }
         
         // 名前を入力して記録を保存
@@ -699,8 +742,8 @@
                     item.innerHTML = `
                         <span class="rank">${i + 1}位</span>
                         <span class="name">${record.name}</span>
-                        <span class="time">${minutes}分${seconds}秒</span>
-                    `;
+                        <span class="time">${minutes}分${seconds}秒 (ミス: ${record.missCount || 0})</span>
+                    `; // ミス回数も表示
                     rankingList.appendChild(item);
                 }
                 
@@ -711,21 +754,12 @@
             
             document.getElementById('rankingModal').style.display = 'flex';
         }
-
-
         
         // ランキングモーダルを閉じる
         function closeRankingModal() {
             document.getElementById('rankingModal').style.display = 'none';
         }
         
-        // closeModal関数を更新
-        function closeModal() {
-            document.getElementById('winModal').style.display = 'none';
-            document.getElementById('nameInputSection').style.display = 'block';
-            document.getElementById('rankingSaved').style.display = 'none';
-            document.getElementById('playerName').value = '';
-        }
         // CSVダウンロード機能を追加
         function downloadRankingData() {
             const rankings = getRankings();
@@ -736,14 +770,14 @@
             }
             
             // CSVヘッダー
-            let csv = '順位,名前,タイム（秒）,タイム（表示）,日付\n';
+            let csv = '順位,名前,タイム（秒）,タイム（表示）,ミス回数,日付\n'; // ヘッダーにミス回数を追加
             
             // データ行を追加
             rankings.forEach((record, index) => {
                 const minutes = Math.floor(record.time / 60);
                 const seconds = record.time % 60;
                 const timeDisplay = `${minutes}分${seconds}秒`;
-                csv += `${index + 1},${record.name},${record.time},${timeDisplay},${record.date}\n`;
+                csv += `${index + 1},${record.name},${record.time},${timeDisplay},${record.missCount || 0},${record.date}\n`; // ミス回数を追加
             });
             
             // BOMを追加（Excelで文字化けを防ぐ）
@@ -761,7 +795,7 @@
             document.body.removeChild(link);
         }
         
-        // 統計情報を表示する関数（オプション）
+        // 統計情報を表示する関数
         function showStatistics() {
             const rankings = getRankings();
             
@@ -772,15 +806,43 @@
             
             const totalPlayers = rankings.length;
             const times = rankings.map(r => r.time);
+            const missCounts = rankings.map(r => r.missCount || 0); // ミス回数も取得
+            
             const avgTime = Math.floor(times.reduce((a, b) => a + b, 0) / totalPlayers);
             const bestTime = Math.min(...times);
             const worstTime = Math.max(...times);
             
+            const avgMissCount = (missCounts.reduce((a, b) => a + b, 0) / totalPlayers).toFixed(1); // 平均ミス回数
+            const minMissCount = Math.min(...missCounts);
+            const maxMissCount = Math.max(...missCounts);
+
             const avgMinutes = Math.floor(avgTime / 60);
             const avgSeconds = avgTime % 60;
             
-            alert(`📊 統計情報\n\n参加者数: ${totalPlayers}人\n平均タイム: ${avgMinutes}分${avgSeconds}秒\n最速: ${Math.floor(bestTime / 60)}分${bestTime % 60}秒\n最遅: ${Math.floor(worstTime / 60)}分${worstTime % 60}秒`);
+            alert(`📊 統計情報\n\n` +
+                  `参加者数: ${totalPlayers}人\n` +
+                  `平均クリアタイム: ${avgMinutes}分${avgSeconds}秒\n` +
+                  `最速クリア: ${Math.floor(bestTime / 60)}分${bestTime % 60}秒\n` +
+                  `最遅クリア: ${Math.floor(worstTime / 60)}分${worstTime % 60}秒\n\n` +
+                  `平均ミス回数: ${avgMissCount}回\n` +
+                  `最小ミス回数: ${minMissCount}回\n` +
+                  `最大ミス回数: ${maxMissCount}回`);
         }
+
+        // ランキングをリセットする関数
+        function resetRankings() {
+            if (confirm('ランキングをすべて削除しますか？')) {
+                localStorage.removeItem('ecGameRankings');
+                alert('ランキングをリセットしました');
+                updateRankingDisplay(); // winModal内のランキング表示を更新
+                updatePlayerCount(); // 挑戦者数をリセット
+            }
+        }
+        
+        // ゲーム開始時に挑戦者数を初期化
+        document.addEventListener('DOMContentLoaded', updatePlayerCount);
+        // ゲーム開始
+        initGame();
     </script>
 </body>
 </html>
