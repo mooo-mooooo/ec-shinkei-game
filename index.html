@@ -415,6 +415,13 @@
             background: #45a049;
             transform: translateY(-2px);
         }
+        /* 新しいボタンの背景色 */
+        .difficulty-buttons button.interest-button {
+            background: #2196F3; /* 青色 */
+        }
+        .difficulty-buttons button.interest-button:hover {
+            background: #1976D2;
+        }
     </style>
 </head>
 <body>
@@ -443,8 +450,9 @@
                 <p>NATIONSに参加したことはありますか？</p>
                 <div class="difficulty-buttons">
                     <!-- 失敗可能数を変更 -->
-                    <button onclick="setDifficulty(2, true)">はい (失敗可能数: 2回)</button>
-                    <button onclick="setDifficulty(3, false)">いいえ (失敗可能数: 3回)</button>
+                    <button onclick="setDifficulty(2, true, false)">はい (失敗可能数: 2回)</button>
+                    <button onclick="setDifficulty(3, false, false)">いいえ (失敗可能数: 3回)</button>
+                    <button class="interest-button" onclick="setDifficulty(4, false, true)">いいえ (興味があるので話を聞きたい) (失敗可能数: 4回)</button>
                 </div>
             </div>
         </div>
@@ -538,6 +546,7 @@
         let attemptsLeft = 0; // 残り失敗可能数
         let playerCount = 1; // 挑戦者数
         let isNationsMember = false; // NATIONS参加者かどうかを判断するフラグ
+        let wantsToHearMore = false; // 興味があるので話を聞きたいフラグ
 
         // 難易度選択モーダルを表示
         document.addEventListener('DOMContentLoaded', () => {
@@ -546,10 +555,11 @@
         });
 
         // 難易度設定
-        function setDifficulty(numAttempts, isMember) { // isMember引数を追加
+        function setDifficulty(numAttempts, isMember, wantsMore) { // isMember, wantsMore引数を追加
             maxAttempts = numAttempts;
             attemptsLeft = numAttempts;
             isNationsMember = isMember; // フラグを設定
+            wantsToHearMore = wantsMore; // フラグを設定
             document.getElementById('difficultyModal').style.display = 'none';
             initGame(); // ゲーム開始
         }
@@ -682,7 +692,10 @@
             const gameOverMessageElement = document.getElementById('gameOverMessage');
             if (isNationsMember) {
                 gameOverMessageElement.textContent = "今後ともNATIONSをよろしくお願いいたします！";
-            } else {
+            } else if (wantsToHearMore) {
+                gameOverMessageElement.textContent = "ECあるあるを言い合いながら売上を伸ばす仲間を作りませんか？ (詳細をご案内します)";
+            }
+            else {
                 gameOverMessageElement.textContent = "ECあるあるを言い合いながら売上を伸ばす仲間を作りませんか？";
             }
             document.getElementById('gameOverModal').style.display = 'flex';
@@ -738,7 +751,8 @@
                 time, 
                 date: new Date().toLocaleDateString(), 
                 missCount: maxAttempts - attemptsLeft,
-                isNationsMember: isNationsMember // NATIONS参加者情報も保存
+                isNationsMember: isNationsMember, // NATIONS参加者情報も保存
+                wantsToHearMore: wantsToHearMore // 興味があるフラグも保存
             }); 
             rankings.sort((a, b) => a.time - b.time);
             localStorage.setItem('ecGameRankings', JSON.stringify(rankings));
@@ -834,7 +848,7 @@
             }
             
             // CSVヘッダー
-            let csv = '順位,名前,タイム（秒）,タイム（表示）,失敗回数,NATIONS参加者,日付\n'; // ヘッダーにNATIONS参加者を追加
+            let csv = '順位,名前,タイム（秒）,タイム（表示）,失敗回数,NATIONS参加者,話を聞きたい,日付\n'; // ヘッダーに「話を聞きたい」を追加
             
             // データ行を追加
             rankings.forEach((record, index) => {
@@ -842,7 +856,8 @@
                 const seconds = record.time % 60;
                 const timeDisplay = `${minutes}分${seconds}秒`;
                 const nationsMemberStatus = record.isNationsMember ? 'はい' : 'いいえ'; // ステータスを文字列に変換
-                csv += `${index + 1},${record.name},${record.time},${timeDisplay},${record.missCount || 0},${nationsMemberStatus},${record.date}\n`; // NATIONS参加者情報も追加
+                const wantsToHearMoreStatus = record.wantsToHearMore ? 'はい' : 'いいえ'; // ステータスを文字列に変換
+                csv += `${index + 1},${record.name},${record.time},${timeDisplay},${record.missCount || 0},${nationsMemberStatus},${wantsToHearMoreStatus},${record.date}\n`; // NATIONS参加者情報、話を聞きたい情報も追加
             });
             
             // BOMを追加（Excelで文字化けを防ぐ）
@@ -873,6 +888,7 @@
             const times = rankings.map(r => r.time);
             const missCounts = rankings.map(r => r.missCount || 0); // 失敗回数も取得
             const nationsMembers = rankings.filter(r => r.isNationsMember).length; // NATIONS参加者数
+            const wantsToHearMoreCount = rankings.filter(r => r.wantsToHearMore).length; // 話を聞きたい人数
 
             const avgTime = Math.floor(times.reduce((a, b) => a + b, 0) / totalPlayers);
             const bestTime = Math.min(...times);
@@ -887,7 +903,8 @@
             
             alert(`📊 統計情報\n\n` +
                   `参加者数: ${totalPlayers}人\n` +
-                  `NATIONS参加者: ${nationsMembers}人\n` + // NATIONS参加者数を追加
+                  `NATIONS参加者: ${nationsMembers}人\n` + 
+                  `話を聞きたい人数: ${wantsToHearMoreCount}人\n` + // 話を聞きたい人数を追加
                   `平均クリアタイム: ${avgMinutes}分${avgSeconds}秒\n` +
                   `最速クリア: ${Math.floor(bestTime / 60)}分${bestTime % 60}秒\n` +
                   `最遅クリア: ${Math.floor(worstTime / 60)}分${worstTime % 60}秒\n\n` +
