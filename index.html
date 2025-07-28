@@ -114,10 +114,16 @@
             }
         }
 
-        .card {
+                .card {
             aspect-ratio: 3/2;
-            background: linear-gradient(135deg, #DC143C 0%, #B22222 100%);
-            color: white;
+            /* 既存のbackgroundを削除またはコメントアウト */
+            /* background: linear-gradient(135deg, #DC143C 0%, #B22222 100%); */
+            
+            /* ここから画像を指定するCSSを追加 */
+            background: url('card_back.png') no-repeat center center; /* 'card_back.png'をあなたの画像ファイル名に置き換えてください */
+            background-size: cover; /* カード全体に画像をフィットさせる */
+            
+            color: white; /* テキストの色。画像に影響されなければそのままでOK */
             display: flex;
             align-items: center;
             justify-content: center;
@@ -133,6 +139,25 @@
             min-height: 80px;
             font-weight: bold;
         }
+
+        /* カードが裏返し（テキストが見えている状態）の時に'?'を非表示にする */
+        .card:not(.flipped):not(.matched)::before { /* ホバーエフェクトの調整（不要であれば削除） */
+            content: ''; /* これを削除またはコメントアウト */
+            /* 以前のcontent: '?' を削除します */
+        }
+        .card:not(.flipped):not(.matched) {
+            text-indent: -9999px; /* テキスト（?）を画面外に飛ばして非表示にする */
+            line-height: 0; /* テキストの行の高さをなくす */
+            font-size: 0; /* フォントサイズも0に */
+        }
+
+        /* めくられたカードは通常通りテキスト表示 */
+        .card.flipped, .card.matched {
+            text-indent: 0;
+            line-height: initial;
+            font-size: initial; /* 元のフォントサイズに戻す */
+        }
+
 
         .card::before {
             content: '';
