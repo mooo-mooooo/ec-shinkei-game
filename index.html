@@ -116,8 +116,8 @@
 
         .card {
             aspect-ratio: 3/2;
-            /* card_back.png は使用しないため削除 */
-            background: linear-gradient(135deg, #DC143C 0%, #B22222 100%); /* カードの裏面の背景色 */
+            background: url('card_back.png') no-repeat center center; /* 'card_back.png'をあなたの画像ファイル名に置き換えてください */
+            background-size: cover; /* カード全体に画像をフィットさせる */
             color: transparent; /* 文字を透明にする (表面用) */
             display: flex;
             align-items: center;
