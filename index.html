@@ -516,7 +516,7 @@
         <!-- 勝利モーダル -->
         <div id="winModal" class="modal">
             <div class="modal-content">
-                <h2>🎉 クリアおめでとうございます！ 🎉</h2>
+                <h2>🎉 ナイスクリア 🎉<br>おめでとうございます！</h2>
                 <p id="clearTime"></p>
                 
                 <div id="nameInputSection">
@@ -543,7 +543,7 @@
         <!-- ゲームオーバーモーダル -->
         <div id="gameOverModal" class="modal">
             <div class="modal-content">
-                <h2 id="gameOverTitle">挑戦ありがとうございました！</h2>
+                <h2 id="gameOverTitle">挑戦<br>ありがとうございました！</h2>
                 <p id="gameOverMessage"></p>
                 <button onclick="resetGame()">リセット</button>
             </div>
@@ -764,10 +764,10 @@
             if (isNationsMember) {
                 gameOverMessageElement.textContent = "今後ともNATIONSをよろしくお願いいたします！";
             } else if (wantsToHearMore) {
-                gameOverMessageElement.textContent = "ECあるあるを言い合いながら売上を伸ばす仲間を作りませんか？ (詳細をご案内します)";
+                gameOverMessageElement.textContent = "ECあるあるを言い合える仲間とともにECの課題を解決していきませんか？";
             }
             else {
-                gameOverMessageElement.textContent = "ECあるあるを言い合いながら売上を伸ばしませんか？";
+                gameOverMessageElement.textContent = "ECあるあるを言い合える仲間とともにECの課題を解決していきませんか？ (詳細をご案内します)";
             }
             document.getElementById('gameOverModal').style.display = 'flex';
         }
