@@ -579,7 +579,8 @@
         let cards = [];
         let flippedCards = [];
         let matchedPairs = 0;
-        const totalPairs = 6; // カードが12枚なのでペアは6つ
+        // totalPairsをcardPairsの要素数（12）に合わせる
+        const totalPairs = cardPairs.length; // 6ペアではなく、12ペアに修正
 
         let canFlip = true;
         let startTime = null;
@@ -612,16 +613,12 @@
             const gameBoard = document.getElementById('gameBoard');
             gameBoard.innerHTML = '';
             
-            // cardPairsからランダムに6ペアを選択
-            // ただし、今回は全ての「あるある」を裏面に使いたいので、
-            // cardPairsの全要素を対象にする
-            const allPossiblePairs = [...cardPairs]; // 全てのペアをコピー
+            // すべてのcardPairsを使用し、シャッフル
+            const shuffledCardPairs = [...cardPairs].sort(() => Math.random() - 0.5);
 
             // カードの内容を生成
             const allCardContents = [];
-            
-            // 各あるあるについて、あるあるカードと解決策カードを生成
-            allPossiblePairs.forEach(pair => {
+            shuffledCardPairs.forEach(pair => {
                 // あるあるカード: 裏面は「あるある」、表面は「解決策」
                 allCardContents.push({ 
                     type: 'あるある', 
@@ -629,60 +626,34 @@
                     frontText: pair.解決策, 
                     solutionId: pair.解決策 // ペア判定用のID
                 });
-                // 解決策カード: 裏面は「あるある」（別の「あるある」）、表面は「解決策」
-                // ここで、このペアの「あるある」テキストを裏面に表示
+                // 解決策カード: 裏面は「あるある」 (←ここを修正)、表面は「解決策」
                 allCardContents.push({ 
                     type: '解決策', 
-                    backText: pair.解決策, // 解決策カードの裏面は解決策に
+                    backText: pair.あるある, // 解決策カードの裏面も「あるある」に設定
                     frontText: pair.解決策, 
                     solutionId: pair.解決策 // ペア判定用のID
                 });
             });
 
-            // ここが問題の箇所でした。
-            // 12種類全て異なるあるあるを裏面に表示し、
-            // そのあるあるに対応する解決策を表面に表示する、という構造にします。
-            // そして、解決策が同じカード同士がペアになる、というロジックにします。
-
-            const cardDataForGame = [];
-
-            // 各pairから「あるある」と「解決策」のカードを作成
-            cardPairs.forEach(pair => { // cardPairsの全要素を使用
-                // あるあるカード
-                cardDataForGame.push({
-                    cardType: 'あるある',
-                    backContent: pair.あるある, // 裏面のあるある
-                    frontContent: pair.解決策, // 表面の解決策
-                    matchId: pair.解決策 // ペア判定用ID (解決策テキスト)
-                });
-                // 解決策カード
-                cardDataForGame.push({
-                    cardType: '解決策',
-                    backContent: pair.解決策, // 裏面も解決策
-                    frontContent: pair.解決策, // 表面も解決策
-                    matchId: pair.解決策 // ペア判定用ID (解決策テキスト)
-                });
-            });
-            
-            // カードをシャッフル
-            const shuffledCards = [...cardDataForGame].sort(() => Math.random() - 0.5);
+            // 生成されたカードをさらにシャッフル
+            const finalShuffledCards = [...allCardContents].sort(() => Math.random() - 0.5);
             
             // カードを作成
-            shuffledCards.forEach((data, index) => {
+            finalShuffledCards.forEach((data, index) => {
                 const card = document.createElement('div');
                 card.className = 'card';
-                card.dataset.cardType = data.cardType; // あるあるか解決策か
-                card.dataset.matchId = data.matchId; // ペアチェック用のID (解決策テキスト)
+                card.dataset.type = data.type; // あるあるか解決策か
+                card.dataset.solutionId = data.solutionId; // ペアチェック用のID
 
                 // 裏面表示用コンテンツ
                 const cardBackContent = document.createElement('div');
                 cardBackContent.className = 'card-back-content';
-                cardBackContent.textContent = data.backContent; // 裏面テキストを設定
+                cardBackContent.textContent = data.backText; // 裏面テキストを設定
 
                 // 表面表示用コンテンツ
                 const cardFrontContent = document.createElement('div');
                 cardFrontContent.className = 'card-front-content';
-                cardFrontContent.textContent = data.frontContent; // 表面テキストを設定
+                cardFrontContent.textContent = data.frontText; // 表面テキストを設定
 
                 card.appendChild(cardBackContent);
                 card.appendChild(cardFrontContent);
@@ -691,7 +662,6 @@
                 gameBoard.appendChild(card);
                 cards.push(card);
             });
-
 
             // 変数リセット
             matchedPairs = 0;
@@ -739,8 +709,8 @@
         function checkMatch() {
             const [card1, card2] = flippedCards;
             
-            // matchId（解決策テキスト）が一致し、かつcardTypeが異なる（あるあるカードと解決策カード）場合にペア成立
-            if (card1.dataset.matchId === card2.dataset.matchId && card1.dataset.cardType !== card2.dataset.cardType) {
+            // solutionIdが一致し、かつtypeが異なる（あるあるカードと解決策カード）場合にペア成立
+            if (card1.dataset.solutionId === card2.dataset.solutionId && card1.dataset.type !== card2.dataset.type) {
                 // ペア成立
                 setTimeout(() => {
                     card1.classList.add('matched');
@@ -801,7 +771,7 @@
                 gameOverMessageElement.textContent = "ECあるあるを言い合いながら売上を伸ばす仲間を作りませんか？ (詳細をご案内します)";
             }
             else {
-                gameOverMessageElement.textContent = "ECあるあるを言い合いながら売上を伸ばす仲間を作りませんか？";
+                gameOverMessageElement.textContent = "ECあるあるを言い合いながら売上を伸ばしませんか？"; // メッセージ修正
             }
             document.getElementById('gameOverModal').style.display = 'flex';
         }
@@ -1010,7 +980,7 @@
 
         // ランキングをリセットする関数
         function resetRankings() {
-            if (confirm('ランキングをすべて削除します?')) {
+            if (confirm('ランキングをすべて削除しますか？')) {
                 localStorage.removeItem('ecGameRankings');
                 alert('ランキングをリセットしました');
                 updateRankingDisplay();
