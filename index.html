@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="ja">
 <head>
@@ -576,10 +577,14 @@
             { あるある: "ECに関するスキルをどうやって身に着けていくのか分からない", 解決策: "楽天NATIONSへの参加" }
         ];
 
+
         let cards = [];
         let flippedCards = [];
         let matchedPairs = 0;
-        const totalPairsInGame = 6; // ゲームで実際に使うペアの数（12枚のカード）
+        // const totalPairsInGame = 6; // 削除またはコメントアウト
+        const totalSolutions = 6; // 解決策の種類数
+        const totalCards = 12; // カードの総数
+
 
         let canFlip = true;
         let startTime = null;
@@ -612,71 +617,49 @@
             const gameBoard = document.getElementById('gameBoard');
             gameBoard.innerHTML = '';
             
-            // cardPairsからランダムにtotalPairsInGame（6）個のペアを選択
-            const selectedPairs = [...cardPairs].sort(() => Math.random() - 0.5).slice(0, totalPairsInGame);
-
-            // カードの内容を生成
-            const allCardContents = [];
-            selectedPairs.forEach(pair => {
-                // あるあるカード: 裏面は「あるある」、表面は「解決策」
-                allCardContents.push({ 
-                    type: 'あるある', 
-                    backText: pair.あるある, 
-                    frontText: pair.解決策, 
-                    solutionId: pair.解決策 // ペア判定用のID
-                });
-                // 解決策カード: 裏面は「あるある」、表面は「解決策」
-                allCardContents.push({ 
-                    type: '解決策', 
-                    backText: pair.あるある, // 解決策カードの裏面も「あるある」に設定
-                    frontText: pair.解決策, 
-                    solutionId: pair.解決策 // ペア判定用のID
-                });
-            });
-
-            // 生成されたカードをさらにシャッフル
-            const finalShuffledCards = [...allCardContents].sort(() => Math.random() - 0.5);
+            // cardPairs をそのままシャッフルして、12枚のカードとして利用
+            const allCardContents = [...cardPairs].sort(() => Math.random() - 0.5);
             
             // カードを作成
-            finalShuffledCards.forEach((data, index) => {
+            allCardContents.forEach((data, index) => {
                 const card = document.createElement('div');
                 card.className = 'card';
-                card.dataset.type = data.type; // あるあるか解決策か
-                card.dataset.solutionId = data.solutionId; // ペアチェック用のID
-
+                // typeは不要になるが、残しておいても問題ない
+                // card.dataset.type = 'あるある'; // すべてあるあるカードとみなす
+                card.dataset.solutionId = data.解決策; // ペアチェック用のIDは「解決策」
+        
                 // 裏面表示用コンテンツ
                 const cardBackContent = document.createElement('div');
                 cardBackContent.className = 'card-back-content';
-                cardBackContent.textContent = data.backText; // 裏面テキストを設定
-
+                cardBackContent.textContent = data.あるある; // 裏面は「あるある」
+        
                 // 表面表示用コンテンツ
                 const cardFrontContent = document.createElement('div');
                 cardFrontContent.className = 'card-front-content';
-                cardFrontContent.textContent = data.frontText; // 表面テキストを設定
-
+                cardFrontContent.textContent = data.解決策; // 表面は「解決策」
+                
                 card.appendChild(cardBackContent);
                 card.appendChild(cardFrontContent);
-
                 card.addEventListener('click', flipCard);
                 gameBoard.appendChild(card);
                 cards.push(card);
             });
-
+        
             // 変数リセット
             matchedPairs = 0;
             canFlip = true;
             flippedCards = [];
             attemptsLeft = maxAttempts;
-
+            
             // 表示を更新
-            document.getElementById('score').textContent = `ペア: 0 / ${totalPairsInGame}`;
+            document.getElementById('score').textContent = `ペア: 0 / ${totalSolutions}`; // ここを「解決策の種類数」に
             document.getElementById('attemptsLeft').textContent = `残り失敗可能数: ${attemptsLeft}`;
-
             // タイマー開始
             startTime = Date.now();
             updateTimer();
             timerInterval = setInterval(updateTimer, 100);
         }
+
 
         // タイマー更新
         function updateTimer() {
@@ -708,16 +691,16 @@
         function checkMatch() {
             const [card1, card2] = flippedCards;
             
-            // solutionIdが一致し、かつtypeが異なる（あるあるカードと解決策カード）場合にペア成立
-            if (card1.dataset.solutionId === card2.dataset.solutionId && card1.dataset.type !== card2.dataset.type) {
+            // solutionIdが一致すればペア成立
+            if (card1.dataset.solutionId === card2.dataset.solutionId) { // ここを変更
                 // ペア成立
                 setTimeout(() => {
                     card1.classList.add('matched');
                     card2.classList.add('matched');
                     matchedPairs++;
-                    document.getElementById('score').textContent = `ペア: ${matchedPairs} / ${totalPairsInGame}`;
+                    document.getElementById('score').textContent = `ペア: ${matchedPairs} / ${totalSolutions}`; // totalSolutions を使用
                     
-                    if (matchedPairs === totalPairsInGame) { // 全ペアが揃ったらクリア
+                    if (matchedPairs === totalSolutions) { // 全ペアが揃ったらクリア
                         clearInterval(timerInterval);
                         showWinModal();
                     }
@@ -729,7 +712,6 @@
                 // ペア不成立
                 attemptsLeft--;
                 document.getElementById('attemptsLeft').textContent = `残り失敗可能数: ${attemptsLeft}`;
-
                 setTimeout(() => {
                     card1.classList.remove('flipped');
                     card2.classList.remove('flipped');
@@ -744,6 +726,7 @@
                 }, 1000);
             }
         }
+    
 
         // 勝利モーダル表示
         function showWinModal() {
