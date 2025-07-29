@@ -579,8 +579,7 @@
         let cards = [];
         let flippedCards = [];
         let matchedPairs = 0;
-        // totalPairsをcardPairsの要素数（12）に合わせる
-        const totalPairs = cardPairs.length; // 6ペアではなく、12ペアに修正
+        const totalPairsInGame = 6; // ゲームで実際に使うペアの数（12枚のカード）
 
         let canFlip = true;
         let startTime = null;
@@ -595,7 +594,7 @@
         document.addEventListener('DOMContentLoaded', () => {
             document.getElementById('difficultyModal').style.display = 'flex';
             updatePlayerCount();
-            document.getElementById('score').textContent = `ペア: 0 / ${totalPairs}`; // 初期表示の更新
+            document.getElementById('score').textContent = `ペア: 0 / ${totalPairsInGame}`; // 初期表示の更新
         });
 
         // 難易度設定
@@ -613,12 +612,12 @@
             const gameBoard = document.getElementById('gameBoard');
             gameBoard.innerHTML = '';
             
-            // すべてのcardPairsを使用し、シャッフル
-            const shuffledCardPairs = [...cardPairs].sort(() => Math.random() - 0.5);
+            // cardPairsからランダムにtotalPairsInGame（6）個のペアを選択
+            const selectedPairs = [...cardPairs].sort(() => Math.random() - 0.5).slice(0, totalPairsInGame);
 
             // カードの内容を生成
             const allCardContents = [];
-            shuffledCardPairs.forEach(pair => {
+            selectedPairs.forEach(pair => {
                 // あるあるカード: 裏面は「あるある」、表面は「解決策」
                 allCardContents.push({ 
                     type: 'あるある', 
@@ -626,7 +625,7 @@
                     frontText: pair.解決策, 
                     solutionId: pair.解決策 // ペア判定用のID
                 });
-                // 解決策カード: 裏面は「あるある」 (←ここを修正)、表面は「解決策」
+                // 解決策カード: 裏面は「あるある」、表面は「解決策」
                 allCardContents.push({ 
                     type: '解決策', 
                     backText: pair.あるある, // 解決策カードの裏面も「あるある」に設定
@@ -670,7 +669,7 @@
             attemptsLeft = maxAttempts;
 
             // 表示を更新
-            document.getElementById('score').textContent = `ペア: 0 / ${totalPairs}`;
+            document.getElementById('score').textContent = `ペア: 0 / ${totalPairsInGame}`;
             document.getElementById('attemptsLeft').textContent = `残り失敗可能数: ${attemptsLeft}`;
 
             // タイマー開始
@@ -716,9 +715,9 @@
                     card1.classList.add('matched');
                     card2.classList.add('matched');
                     matchedPairs++;
-                    document.getElementById('score').textContent = `ペア: ${matchedPairs} / ${totalPairs}`;
+                    document.getElementById('score').textContent = `ペア: ${matchedPairs} / ${totalPairsInGame}`;
                     
-                    if (matchedPairs === totalPairs) { // 全ペアが揃ったらクリア
+                    if (matchedPairs === totalPairsInGame) { // 全ペアが揃ったらクリア
                         clearInterval(timerInterval);
                         showWinModal();
                     }
@@ -771,7 +770,7 @@
                 gameOverMessageElement.textContent = "ECあるあるを言い合いながら売上を伸ばす仲間を作りませんか？ (詳細をご案内します)";
             }
             else {
-                gameOverMessageElement.textContent = "ECあるあるを言い合いながら売上を伸ばしませんか？"; // メッセージ修正
+                gameOverMessageElement.textContent = "ECあるあるを言い合いながら売上を伸ばしませんか？";
             }
             document.getElementById('gameOverModal').style.display = 'flex';
         }
