@@ -103,15 +103,14 @@
             }
         }
 
-        @media (min-width: 481px) and (max-width: 768px) {
+         @media (min-width: 481px) and (max-width: 768px) {
             #gameBoard {
-                grid-template-columns: repeat(4, 1fr); /* タブレットでは4列 */
+                grid-template-columns: repeat(3, 1fr); /* タブレットでは3列 (縦4枚、横3枚) */
             }
         }
-
         @media (min-width: 769px) {
             #gameBoard {
-                grid-template-columns: repeat(4, 1fr); /* デスクトップでは4列 */
+                grid-template-columns: repeat(4, 1fr); /* デスクトップでは4列 (縦3枚、横4枚) */
             }
         }
 
@@ -469,7 +468,8 @@
 </head>
 <body>
     <div class="game-container">
-        <h1><center>🛍️ ECあるある 解決神経衰弱 🛍️</center></h1>
+        <h1><center>🛍️ ECあるある 解決神経衰弱 🛍️<br>
+        解決策が同じ「あるあるな課題」を見つけましょう！</center></h1>
         
         <div class="game-info">
             <div id="score">ペア: 0 / 6</div>
