@@ -116,14 +116,8 @@
 
         .card {
             aspect-ratio: 3/2;
-            /* 既存のbackgroundを削除またはコメントアウト */
-            /* background: linear-gradient(135deg, #DC143C 0%, #B22222 100%); */
-            
-            /* ここから画像を指定するCSSを追加 */
-            background: url('card_back.png') no-repeat center center; /* 'card_back.png'をあなたの画像ファイル名に置き換えてください */
-            background-size: cover; /* カード全体に画像をフィットさせる */
-            
-            /*color: white; /* テキストの色。画像に影響されなければそのままでOK */
+            background: url('card_back.png') no-repeat center center;
+            background-size: cover;
             color: transparent; /* 文字を透明にする */
             display: flex;
             align-items: center;
@@ -140,25 +134,6 @@
             min-height: 80px;
             font-weight: bold;
         }
-
-        /* カードが裏返し（テキストが見えている状態）の時に'?'を非表示にする */
-        .card:not(.flipped):not(.matched)::before { /* ホバーエフェクトの調整（不要であれば削除） */
-            content: ''; /* これを削除またはコメントアウト */
-            /* 以前のcontent: '?' を削除します */
-        }
-        .card:not(.flipped):not(.matched) {
-            text-indent: -9999px; /* テキスト（?）を画面外に飛ばして非表示にする */
-            line-height: 0; /* テキストの行の高さをなくす */
-            font-size: 0; /* フォントサイズも0に */
-        }
-
-        /* めくられたカードは通常通りテキスト表示 */
-        .card.flipped, .card.matched {
-            text-indent: 0;
-            line-height: initial;
-            font-size: initial; /* 元のフォントサイズに戻す */
-        }
-
 
         .card::before {
             content: '';
@@ -183,7 +158,7 @@
 
         .card.flipped {
             background: white;
-            color: #DC143C;
+            color: #DC143C; /* めくられたときに文字色を赤にする */
             border: 3px solid #DC143C;
             animation: flipAnimation 0.3s ease;
             font-weight: bold;
@@ -448,6 +423,53 @@
         .difficulty-buttons button.interest-button:hover {
             background: #1976D2;
         }
+
+        /* カードの裏面と表面のテキスト表示調整 */
+        .card .card-back-content { /* 裏面（あるある）表示用 */
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: white; /* 裏面の文字色 */
+            z-index: 2; /* 画像より手前に表示 */
+            display: flex; /* 中央寄せのため */
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            height: 100%;
+            padding: 5px; /* テキストが端に寄りすぎないように */
+            box-sizing: border-box;
+        }
+        .card.flipped .card-back-content {
+            display: none; /* めくれたら裏面は非表示 */
+        }
+        .card .card-front-content { /* 表面（解決策）表示用 */
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: transparent; /* 最初は透明 */
+            z-index: 3; /* 裏面より手前 */
+            display: flex; /* 中央寄せのため */
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            height: 100%;
+            padding: 5px;
+            box-sizing: border-box;
+        }
+        .card.flipped .card-front-content {
+            color: #DC143C; /* めくれたら色を出す */
+        }
+        .card.matched .card-front-content {
+            color: white; /* マッチしたら白に */
+        }
+        /* カードの文字を非表示にする設定は不要 */
+        .card:not(.flipped):not(.matched) {
+            /* text-indent: -9999px; */
+            /* line-height: 0; */
+            /* font-size: 0; */
+        }
     </style>
 </head>
 <body>
@@ -476,9 +498,9 @@
                 <p>NATIONSに参加したことはありますか？</p>
                 <div class="difficulty-buttons">
                     <!-- 失敗可能数を変更 -->
-                    <button onclick="setDifficulty(2, true, false)">はい (失敗可能数: 2回)</button>
-                    <button onclick="setDifficulty(3, false, false)">いいえ (失敗可能数: 3回)</button>
-                    <button class="interest-button" onclick="setDifficulty(4, false, true)">いいえ (興味があるので話を聞きたい) (失敗可能数: 4回)</button>
+                    <button onclick="setDifficulty(1, true, false)">はい (失敗可能数: 1回)</button>
+                    <button onclick="setDifficulty(2, false, false)">いいえ (失敗可能数: 2回)</button>
+                    <button class="interest-button" onclick="setDifficulty(3, false, true)">いいえ (興味があるので話を聞きたい) (失敗可能数: 3回)</button>
                 </div>
             </div>
         </div>
@@ -546,20 +568,20 @@
     </div>
 
     <script>
-        // カードの内容（ペアで用意）
-        const cardContents = [
-            "深夜まで受発注・梱包作業😴",
-            "深夜まで受発注・梱包作業😴",
-            "商品撮影で1日終了📸",
-            "商品撮影で1日終了📸",
-            "在庫確認ミスで冷や汗💦",
-            "在庫確認ミスで冷や汗💦",
-            "レビュー★1の衝撃😱",
-            "レビュー★1の衝撃😱",
-            "SALE前の準備地獄🔥",
-            "SALE前の準備地獄🔥",
-            "売れない日の不安☔",
-            "売れない日の不安☔"
+        // カードの内容を「あるある」と「解決策」のペアで定義
+        const cardPairs = [
+            { あるある: "深夜までの出荷作業😴", 解決策: "RSL、物流システム導入" },
+            { あるある: "カオスな在庫管理🤯", 解決策: "RSL、物流システム導入" },
+            { あるある: "終わらない商品登録✍️", 解決策: "CSV一括登録、AI活用" },
+            { あるある: "SALEやイベント前の怒涛の準備🔥", 解決策: "CSV一括登録、AI活用" },
+            { あるある: "広告費ばかりかさんで、費用対効果が見合わない💸", 解決策: "商品ページの見直し" },
+            { あるある: "転換率（CVR）が伸びない📈", 解決策: "商品ページの見直し" },
+            { あるある: "ブランドイメージが確立せず、競合との差別化が難しい🤔", 解決策: "コンテンツページの作成" },
+            { あるある: "セールやイベント企画がマンネリ化し、売上が伸び悩む📉", 解決策: "コンテンツページの作成" },
+            { あるある: "モチベーションが上がらず、EC運営が楽しくない😔", 解決策: "楽天NATIONSへの参加" },
+            { あるある: "楽天のルール変更やシステムアップデートに追いつけない😵", 解決策: "楽天NATIONSへの参加" },
+            { あるある: "データ分析ができておらず、次の打ち手が分からない❓", 解決策: "楽天NATIONSへの参加" },
+            { あるある: "ECに関するスキルをどうやって身に着けていくのか分からない🤷‍♀️", 解決策: "楽天NATIONSへの参加" }
         ];
 
         let cards = [];
@@ -595,16 +617,37 @@
             const gameBoard = document.getElementById('gameBoard');
             gameBoard.innerHTML = '';
             
+            // カードの内容を生成 (あるある + 解決策)
+            const allCardContents = [];
+            cardPairs.forEach(pair => {
+                allCardContents.push({ type: 'あるある', content: pair.あるある, solution: pair.解決策 });
+                allCardContents.push({ type: '解決策', content: pair.解決策, solution: pair.解決策 }); // 解決策もペアチェック用データとして持つ
+            });
+
             // カードをシャッフル
-            const shuffled = [...cardContents].sort(() => Math.random() - 0.5);
+            const shuffled = [...allCardContents].sort(() => Math.random() - 0.5);
             
             // カードを作成
-            shuffled.forEach((content, index) => {
+            shuffled.forEach((data, index) => {
                 const card = document.createElement('div');
                 card.className = 'card';
-                card.dataset.content = content;
-                card.dataset.index = index;
-                card.textContent = '?';
+                card.dataset.type = data.type; // あるあるか解決策か
+                card.dataset.content = data.content; // 表示する内容
+                card.dataset.solution = data.solution; // ペアチェック用の解決策
+
+                // 裏面（あるある）の表示要素
+                const cardBackContent = document.createElement('div');
+                cardBackContent.className = 'card-back-content';
+                cardBackContent.textContent = data.type === 'あるある' ? data.content : data.solution; // あるあるはそのまま、解決策も裏面には解決策を表示
+
+                // 表面（解決策）の表示要素
+                const cardFrontContent = document.createElement('div');
+                cardFrontContent.className = 'card-front-content';
+                cardFrontContent.textContent = data.solution; // めくった時に表示する解決策
+
+                card.appendChild(cardBackContent);
+                card.appendChild(cardFrontContent);
+
                 card.addEventListener('click', flipCard);
                 gameBoard.appendChild(card);
                 cards.push(card);
@@ -637,14 +680,13 @@
 
         // カードをめくる
         function flipCard(e) {
-            const card = e.target;
+            const card = e.target.closest('.card'); // .card要素を取得
             
-            if (!canFlip || card.classList.contains('flipped') || card.classList.contains('matched')) {
+            if (!card || !canFlip || card.classList.contains('flipped') || card.classList.contains('matched')) {
                 return;
             }
             
             card.classList.add('flipped');
-            card.textContent = card.dataset.content;
             flippedCards.push(card);
             
             if (flippedCards.length === 2) {
@@ -657,8 +699,9 @@
         function checkMatch() {
             const [card1, card2] = flippedCards;
             
-            if (card1.dataset.content === card2.dataset.content) {
-                // ペア成立
+            // solutionデータが一致するかでペアを判断
+            if (card1.dataset.solution === card2.dataset.solution && card1.dataset.type !== card2.dataset.type) {
+                // ペア成立（あるあると解決策の組み合わせ）
                 setTimeout(() => {
                     card1.classList.add('matched');
                     card2.classList.add('matched');
@@ -681,8 +724,6 @@
                 setTimeout(() => {
                     card1.classList.remove('flipped');
                     card2.classList.remove('flipped');
-                    card1.textContent = '?';
-                    card2.textContent = '?';
                     flippedCards = [];
                     
                     if (attemptsLeft <= 0) { // 残り失敗可能数が0以下になったらゲームオーバー
