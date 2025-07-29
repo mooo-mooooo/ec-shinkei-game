@@ -502,9 +502,12 @@
                 <h2>難易度選択</h2>
                 <p>NATIONSに参加したことはありますか？</p>
                 <div class="difficulty-buttons">
-                    <button onclick="setDifficulty(2, true, false)">はい (失敗可能数: 2回)</button>
-                    <button onclick="setDifficulty(3, false, false)">いいえ (失敗可能数: 3回)</button>
-                    <button class="interest-button" onclick="setDifficulty(4, false, true)">いいえ (興味があるので話を聞きたい) (失敗可能数: 4回)</button>
+                    <!-- 変更前: setDifficulty(2, true, false) -->
+                    <button onclick="setDifficulty(1, true, false)">はい (失敗可能数: 1回)</button>
+                    <!-- 変更前: setDifficulty(3, false, false) -->
+                    <button onclick="setDifficulty(2, false, false)">いいえ (失敗可能数: 2回)</button>
+                    <!-- 変更前: setDifficulty(4, false, true) -->
+                    <button class="interest-button" onclick="setDifficulty(3, false, true)">いいえ (興味があるので話を聞きたい) (失敗可能数: 3回)</button>
                 </div>
             </div>
         </div>
@@ -574,8 +577,8 @@
     <script>
         // カードの内容を「あるある」と「解決策」のペアで定義
         const cardPairs = [
-            { あるある: "深夜までの出荷作業", 解決策: "RSL、物流システム導入" },
-            { あるある: "カオスな在庫管理", 解決策: "RSL、物流システム導入" },
+            { あるある: "深夜までの出荷作業", 解決策: "RSL、物流システムの導入" },
+            { あるある: "カオスな在庫管理", 解決策: "RSL、物流システムの導入" },
             { あるある: "終わらない商品登録", 解決策: "CSV一括登録、AI活用" },
             { あるある: "SALEやイベント前の怒涛の準備", 解決策: "CSV一括登録、AI活用" },
             { あるある: "広告費ばかりかさんで費用対効果が見合わない", 解決策: "商品ページの見直し" },
