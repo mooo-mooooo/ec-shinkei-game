@@ -116,9 +116,9 @@
 
         .card {
             aspect-ratio: 3/2;
-            background: url('card_back.png') no-repeat center center;
-            background-size: cover;
-            color: transparent; /* 文字を透明にする */
+            /* card_back.png は使用しないため削除 */
+            background: linear-gradient(135deg, #DC143C 0%, #B22222 100%); /* カードの裏面の背景色 */
+            color: transparent; /* 文字を透明にする (表面用) */
             display: flex;
             align-items: center;
             justify-content: center;
@@ -157,7 +157,7 @@
         }
 
         .card.flipped {
-            background: white;
+            background: white; /* めくられたカードの背景色 */
             color: #DC143C; /* めくられたときに文字色を赤にする */
             border: 3px solid #DC143C;
             animation: flipAnimation 0.3s ease;
@@ -425,19 +425,19 @@
         }
 
         /* カードの裏面と表面のテキスト表示調整 */
-        .card .card-back-content { /* 裏面（あるある）表示用 */
+        .card .card-back-content { /* 裏面（あるある or 解決策）表示用 */
             position: absolute;
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
             color: black; /* 裏面の文字色を黒に */
-            z-index: 2; /* 画像より手前に表示 */
-            display: flex; /* 中央寄せのため */
+            z-index: 2; 
+            display: flex; 
             align-items: center;
             justify-content: center;
             width: 100%;
             height: 100%;
-            padding: 5px; /* テキストが端に寄りすぎないように */
+            padding: 5px; 
             box-sizing: border-box;
         }
         .card.flipped .card-back-content {
@@ -449,8 +449,8 @@
             left: 50%;
             transform: translate(-50%, -50%);
             color: transparent; /* 最初は透明 */
-            z-index: 3; /* 裏面より手前 */
-            display: flex; /* 中央寄せのため */
+            z-index: 3; 
+            display: flex; 
             align-items: center;
             justify-content: center;
             width: 100%;
@@ -472,7 +472,7 @@
             ～あるあるを言いたい～</center></h1>
         
         <div class="game-info">
-            <div id="score">ペア: 0 / 6</div> <!-- ペア数を6に固定 -->
+            <div id="score">ペア: 0 / 6</div>
             <div id="attemptsLeft">残り失敗可能数: -</div>
             <div id="playerCount">挑戦者: 1人目</div>
             <div id="timer">⏱️ 0:00</div>
@@ -615,13 +615,23 @@
             // cardPairsからランダムに6ペアを選択
             const selectedPairs = [...cardPairs].sort(() => Math.random() - 0.5).slice(0, totalPairs);
 
-            // カードの内容を生成 (あるある + 解決策)
+            // カードの内容を生成
             const allCardContents = [];
             selectedPairs.forEach(pair => {
-                // あるあるカード（裏面にあるある、めくってもあるある）
-                allCardContents.push({ type: 'あるある', displayContent: pair.あるある, solutionContent: pair.解決策 });
-                // 解決策カード（裏面に解決策、めくると解決策）
-                allCardContents.push({ type: '解決策', displayContent: pair.あるある, solutionContent: pair.解決策 });
+                // あるあるカード: 裏面は「あるある」、表面は「解決策」
+                allCardContents.push({ 
+                    type: 'あるある', 
+                    backText: pair.あるある, 
+                    frontText: pair.解決策, 
+                    solutionId: pair.解決策 // ペア判定用のID
+                });
+                // 解決策カード: 裏面は「解決策」、表面は「解決策」
+                allCardContents.push({ 
+                    type: '解決策', 
+                    backText: pair.解決策, 
+                    frontText: pair.解決策, 
+                    solutionId: pair.解決策 // ペア判定用のID
+                });
             });
 
             // カードをシャッフル
@@ -632,17 +642,17 @@
                 const card = document.createElement('div');
                 card.className = 'card';
                 card.dataset.type = data.type; // あるあるか解決策か
-                card.dataset.solutionContent = data.solutionContent; // ペアチェック用の解決策
+                card.dataset.solutionId = data.solutionId; // ペアチェック用のID
 
-                // 裏面（あるある）の表示要素
+                // 裏面表示用コンテンツ
                 const cardBackContent = document.createElement('div');
                 cardBackContent.className = 'card-back-content';
-                cardBackContent.textContent = data.displayContent; // 裏面にはあるあるを表示
+                cardBackContent.textContent = data.backText; // 裏面テキストを設定
 
-                // 表面（解決策）の表示要素
+                // 表面表示用コンテンツ
                 const cardFrontContent = document.createElement('div');
                 cardFrontContent.className = 'card-front-content';
-                cardFrontContent.textContent = data.solutionContent; // めくった時に表示する解決策
+                cardFrontContent.textContent = data.frontText; // 表面テキストを設定
 
                 card.appendChild(cardBackContent);
                 card.appendChild(cardFrontContent);
@@ -679,7 +689,6 @@
 
         // カードをめくる
         function flipCard(e) {
-            // イベントのターゲットがカード自体か、その中のテキスト要素かを確認
             const card = e.target.closest('.card');
             
             if (!card || !canFlip || card.classList.contains('flipped') || card.classList.contains('matched')) {
@@ -699,8 +708,8 @@
         function checkMatch() {
             const [card1, card2] = flippedCards;
             
-            // solutionContentが一致し、かつtypeが異なる（あるあると解決策の組み合わせ）場合にペア成立
-            if (card1.dataset.solutionContent === card2.dataset.solutionContent && card1.dataset.type !== card2.dataset.type) {
+            // solutionIdが一致し、かつtypeが異なる（あるあるカードと解決策カード）場合にペア成立
+            if (card1.dataset.solutionId === card2.dataset.solutionId && card1.dataset.type !== card2.dataset.type) {
                 // ペア成立
                 setTimeout(() => {
                     card1.classList.add('matched');
