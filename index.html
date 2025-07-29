@@ -425,7 +425,7 @@
         }
 
         /* カードの裏面と表面のテキスト表示調整 */
-        .card .card-back-content { /* 裏面（あるある or 解決策）表示用 */
+        .card .card-back-content { /* 裏面（あるある）表示用 */
             position: absolute;
             top: 50%;
             left: 50%;
@@ -625,10 +625,10 @@
                     frontText: pair.解決策, 
                     solutionId: pair.解決策 // ペア判定用のID
                 });
-                // 解決策カード: 裏面は「解決策」、表面は「解決策」
+                // 解決策カード: 裏面は「あるある」 (←ここを修正)、表面は「解決策」
                 allCardContents.push({ 
                     type: '解決策', 
-                    backText: pair.解決策, 
+                    backText: pair.あるある, // 解決策カードの裏面も「あるある」に設定
                     frontText: pair.解決策, 
                     solutionId: pair.解決策 // ペア判定用のID
                 });
